@@ -1,6 +1,6 @@
 ### Project Overview
 ## Concept
-	Can’t Wait Adventure is a vibrant 3D platformer where players embark on a journey through diverse, colorful worlds to rescue the mystical Star Crystals. The game offers single-player and multiplayer modes (Optional), encouraging exploration through open and charming world of ancient cambodia 
+Can’t Wait Adventure is a vibrant 3D platformer where players embark on a journey through diverse, colorful worlds to rescue the mystical Star Crystals. The game offers single-player and multiplayer modes (Optional), encouraging exploration through open and charming world of ancient cambodia 
 ## Project Objective
 We aim to engage players by sparking curiosity and encouraging exploration through secrets, challenges, hidden levels, and collectibles. Our goal is to inspire players to discover their preferences and uncover new aspects of themselves through immersive gameplay. However, we also want the game to be fun, entertaining and a way for players to relieve and detach from the real world. We also intended to add some khmer culture into the game.
 ## Problem Definition
