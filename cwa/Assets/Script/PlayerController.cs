@@ -5,93 +5,166 @@ using System.Linq;
 
 public class PlayerController : MonoBehaviour {
   // Start is called before the first frame update
-  const float gravityValue = -9.8f;
-  Rigidbody rb;
+  public float gravityValue = -9.8f;
+  float minGravity = -0f;
+  float gravity  = -9.8f;
+  float _maxJumpHeight = 5f;
+  float _maxJumpTime = 3f;
+
   [SerializeField]
   float InputX;
   [SerializeField]
   float InputZ;
+
+
+  Vector3 _cameraRelativeMovement;
+
   [SerializeField]
   bool isFalling;
   bool isJumped;
   bool isGround;
+
   CapsuleCollider capsuleCollider;
+
   [SerializeField]
   float speed = 10f;
+
   [SerializeField]
   Vector3 velocity;
+  public LayerMask layerMask;
+  Bounds bounds;
+  int maxBounces = 5;
+  float skinWidth = 0.015f;
+  Animator anim;
 
   void Start() {
-    rb = GetComponent<Rigidbody>();
-    rb.isKinematic = true;
+    //anim = GetComponent<Animator>();
     capsuleCollider = GetComponent<CapsuleCollider>();
   }
+
 
   // Update is called once per frame
   void Update() {
     isFalling = !CheckGrounded(out RaycastHit groundHit);
+    isJumped = !isFalling;
     InputMovement();
     HandleGravity();
     Vector3 input = new Vector3(InputX, 0, InputZ).normalized;
-    Vector3 movement = new Vector3(input.x, 0, input.z);
-    transform.position = MovePlayer(movement * speed * Time.deltaTime);
-    transform.position = MovePlayer(velocity * Time.deltaTime);
+    _cameraRelativeMovement = ConvertToCameraSpace(input) * speed;
+    velocity = new Vector3(_cameraRelativeMovement.x, velocity.y, _cameraRelativeMovement.z);
+    transform.position += Movement(velocity * Time.deltaTime);
+    HandleRotation();
   }
+
 
   void HandleGravity() {
-    if (isFalling) {
-      velocity.y += (gravityValue * Time.deltaTime);
-    } else {
-      velocity.y = 0.0f;
+     if(isFalling) {
+        velocity.y += gravity  * Time.deltaTime;
+     }else{
+        velocity.y = minGravity;
+     }
+  }
+
+  float  maxSlopAngle = 55;
+  // custome collision
+  private Vector3 CollideAndSlide(Vector3 vel, Vector3 pos, int depth, bool gravityPass) {
+    if (depth >= maxBounces) {
+      return Vector3.zero;
     }
+    float dist = vel.magnitude + skinWidth;
+    float radius = capsuleCollider.radius;
+    RaycastHit hit;
+    Vector3 p1 = pos + capsuleCollider.center +
+                 Vector3.up * (( -capsuleCollider.height * 0.5F)+radius);
+    Vector3 p2 = p1 + Vector3.up * capsuleCollider.height;
+    if (Physics.CapsuleCast(p1, p2, radius, vel.normalized, out hit, dist,
+                            layerMask)) {
+      Vector3 snapToSurface = vel.normalized * (hit.distance - skinWidth);
+      Vector3 leftOver = vel - snapToSurface;
+      float angle = Vector3.Angle(Vector3.up, hit.normal);
+
+      if (snapToSurface.magnitude <= skinWidth) {
+        snapToSurface = Vector3.zero;
+      }
+
+
+      if(angle <= maxSlopAngle){
+        if(gravityPass){
+              return snapToSurface;
+        }
+        leftOver = ProjectAndScale(leftOver, hit.normal);
+      }else{
+
+      }
+      return snapToSurface +
+             CollideAndSlide(leftOver, pos + snapToSurface, depth + 1, gravityPass);
+    }
+    return vel;
   }
 
-  Vector3 MovePlayer(Vector3 movement) {
+  private Vector3 ProjectAndScale(Vector3 vec, Vector3 normal){
+      float mag = vec.magnitude;
+      vec = Vector3.ProjectOnPlane(vec, normal).normalized;
+      vec *= mag;
+      return vec;
+  }
+
+  Vector3 ConvertToCameraSpace (Vector3 vector) {
+      Vector3 cameraForward = Camera.main.transform.forward;
+      Vector3 cameraRight = Camera.main.transform.right;
+      cameraForward = cameraForward.normalized;
+      cameraRight = cameraRight.normalized;
+      Vector3 cameraForwardZProduct = vector.z * cameraForward;
+      Vector3 cameraRightXProduct = vector.x * cameraRight;
+      Vector3 vectorRotatedToCameraSpace = cameraRightXProduct + cameraForwardZProduct;
+      return new Vector3(vectorRotatedToCameraSpace.x, vector.y, vectorRotatedToCameraSpace.z);
+  }
+  void HandleRotation () {
+     if(InputX == 0 && InputZ ==0) {
+        return;
+     }
+     Vector3 vectorToLookAt;
+     vectorToLookAt.x = _cameraRelativeMovement.x;
+     vectorToLookAt.y = 0;
+     vectorToLookAt.z = _cameraRelativeMovement.z;
+
+     Quaternion currentRotation = transform.rotation;
+
+     transform.rotation = Quaternion.Slerp(currentRotation, Quaternion.LookRotation(vectorToLookAt), 50f * Time.deltaTime);
+  }
+
+  Vector3 Movement(Vector3 velocity) {
     Vector3 positon = transform.position;
-    positon += movement;
-    return positon;
-  }
-  private bool CheckGrounded(out RaycastHit groundHit) {
-    bool onGround = CastSelf(transform.position, transform.rotation,
-                             Vector3.down, 0.01f, out groundHit);
-    float angle = Vector3.Angle(groundHit.normal, Vector3.up);
-    return onGround;
+    Vector3 movement = CollideAndSlide(velocity, positon, 0,false);
+    movement += CollideAndSlide(Vector3.up * gravity, positon + movement, 0,true);
+    return movement;
   }
 
+
+  private bool CheckGrounded(out RaycastHit groundHit) {
+    return Physics.SphereCast( transform.position + capsuleCollider.center + Vector3.down * (capsuleCollider.height / 2 - capsuleCollider.radius), capsuleCollider.radius,
+                              Vector3.down, out groundHit,0.05f,
+                              layerMask);
+  }
+
+  private void handleJump() {
+     isJumped = true;
+
+  }
   void InputMovement() {
     InputX = Input.GetAxis("Horizontal");
     InputZ = Input.GetAxis("Vertical");
-  }
 
-  public bool CastSelf(Vector3 pos, Quaternion rot, Vector3 dir, float dist,
-                       out RaycastHit hit) {
-    // Get Parameters associated with the KCC
-    Vector3 center = rot * capsuleCollider.center + pos;
-    float radius = capsuleCollider.radius;
-    float height = capsuleCollider.height;
-
-    // Get top and bottom points of collider
-    Vector3 bottom = center + rot * Vector3.down * (height / 2 - radius);
-    Vector3 top = center + rot * Vector3.up * (height / 2 - radius);
-
-    // Check what objects this collider will hit when cast with this
-    // configuration excluding itself
-    IEnumerable<RaycastHit> hits =
-        Physics
-            .CapsuleCastAll(top, bottom, radius, dir, dist, ~0,
-                            QueryTriggerInteraction.Ignore)
-            .Where(hit => hit.collider.transform != transform);
-    bool didHit = hits.Count() > 0;
-
-    // Find the closest objects hit
-    float closestDist =
-        didHit ? Enumerable.Min(hits.Select(hit => hit.distance)) : 0;
-    IEnumerable<RaycastHit> closestHit =
-        hits.Where(hit => hit.distance == closestDist);
-
-    // Get the first hit object out of the things the player collides with
-    hit = closestHit.FirstOrDefault();
-    // Return if any objects were hit
-    return didHit;
+    float Speed = new Vector2(InputX, InputZ).sqrMagnitude;
+    //float allowPlayerRotation = 5f;
+//	if (Speed > allowPlayerRotation) {
+//			anim.SetFloat ("Blend", Speed, 0.5f, Time.deltaTime);
+//		} else if (Speed < allowPlayerRotation) {
+//			anim.SetFloat ("Blend", Speed, 0.3f, Time.deltaTime);
+//	}
+    if(Input.GetKey("space")){
+        handleJump();
+        Debug.Log("jump");
+    }
   }
 }
