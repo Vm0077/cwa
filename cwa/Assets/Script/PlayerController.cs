@@ -5,11 +5,10 @@ using System.Linq;
 
 public class PlayerController : MonoBehaviour {
   // Start is called before the first frame update
-  public float gravityValue = -9.8f;
-  float minGravity = -0f;
-  float gravity  = -9.8f;
-  float _maxJumpHeight = 5f;
-  float _maxJumpTime = 3f;
+  float minGravity = -0.05f;
+  float gravity = -10f;
+  float _maxJumpHeight = 3f;
+  float _maxJumpTime = 0.1f;
 
   [SerializeField]
   float InputX;
@@ -18,16 +17,19 @@ public class PlayerController : MonoBehaviour {
 
 
   Vector3 _cameraRelativeMovement;
+  public ParticleSystem _moveParticle;
 
-  [SerializeField]
-  bool isFalling;
-  bool isJumped;
-  bool isGround;
+  [SerializeField] bool isJumping;
+  [SerializeField] bool isGround;
+  [SerializeField] bool isJumpedPress;
+  [SerializeField] bool isMovePressed;
+
 
   CapsuleCollider capsuleCollider;
 
   [SerializeField]
   float speed = 10f;
+  float initialJumpVelocity;
 
   [SerializeField]
   Vector3 velocity;
@@ -35,33 +37,59 @@ public class PlayerController : MonoBehaviour {
   Bounds bounds;
   int maxBounces = 5;
   float skinWidth = 0.015f;
+  int isRuningHash;
+  int isJumpingHash;
   Animator anim;
+  float counter;
 
+  void Awake () {
+    SetUpJumpVariable();
+  }
   void Start() {
-    //anim = GetComponent<Animator>();
+    anim = GetComponentInChildren<Animator>();
     capsuleCollider = GetComponent<CapsuleCollider>();
+    isRuningHash = Animator.StringToHash("Running");
+    isJumpingHash = Animator.StringToHash("Jumping");
+
   }
 
 
   // Update is called once per frame
   void Update() {
-    isFalling = !CheckGrounded(out RaycastHit groundHit);
-    isJumped = !isFalling;
+    isGround = CheckGrounded(out RaycastHit groundHit);
     InputMovement();
-    HandleGravity();
     Vector3 input = new Vector3(InputX, 0, InputZ).normalized;
     _cameraRelativeMovement = ConvertToCameraSpace(input) * speed;
     velocity = new Vector3(_cameraRelativeMovement.x, velocity.y, _cameraRelativeMovement.z);
     transform.position += Movement(velocity * Time.deltaTime);
     HandleRotation();
+    HandleGravity();
+    HandleJump();
+    handleAnimation();
+    handleParticle();
   }
 
+ void SetUpJumpVariable () {
+     float timeToApex = _maxJumpTime / 2;
+     //gravity = ( -2 * _maxJumpHeight)/ Mathf.Pow(timeToApex,2);
+     initialJumpVelocity = (2 * _maxJumpHeight) / timeToApex;
 
+ }
   void HandleGravity() {
-     if(isFalling) {
-        velocity.y += gravity  * Time.deltaTime;
-     }else{
-        velocity.y = minGravity;
+     bool isFalling = velocity.y  < 0 || !isJumpedPress;
+     if(isGround){
+        velocity.y = 0;
+     }
+     else if (isFalling)
+     {
+        float newYVelcoity = velocity.y + (gravity * Time.deltaTime) * 10f;
+        float nextYVelcoity = (velocity.y + newYVelcoity) *.5f;
+        velocity.y = nextYVelcoity;
+     }
+     else{
+        float newYVelcoity = velocity.y + (gravity * Time.deltaTime);
+        float nextYVelcoity = (velocity.y + newYVelcoity) *.5f;
+        velocity.y = nextYVelcoity;
      }
   }
 
@@ -94,7 +122,6 @@ public class PlayerController : MonoBehaviour {
         }
         leftOver = ProjectAndScale(leftOver, hit.normal);
       }else{
-
       }
       return snapToSurface +
              CollideAndSlide(leftOver, pos + snapToSurface, depth + 1, gravityPass);
@@ -129,42 +156,82 @@ public class PlayerController : MonoBehaviour {
      vectorToLookAt.z = _cameraRelativeMovement.z;
 
      Quaternion currentRotation = transform.rotation;
-
      transform.rotation = Quaternion.Slerp(currentRotation, Quaternion.LookRotation(vectorToLookAt), 50f * Time.deltaTime);
   }
 
   Vector3 Movement(Vector3 velocity) {
     Vector3 positon = transform.position;
     Vector3 movement = CollideAndSlide(velocity, positon, 0,false);
-    movement += CollideAndSlide(Vector3.up * gravity, positon + movement, 0,true);
+    if(!isJumping){
+        movement += CollideAndSlide(Vector3.up * gravity * Time.deltaTime, positon + movement, 0,true);
+    }
     return movement;
   }
 
 
   private bool CheckGrounded(out RaycastHit groundHit) {
-    return Physics.SphereCast( transform.position + capsuleCollider.center + Vector3.down * (capsuleCollider.height / 2 - capsuleCollider.radius), capsuleCollider.radius,
-                              Vector3.down, out groundHit,0.05f,
+    Vector3 p1 = transform.position + capsuleCollider.center + Vector3.down * (capsuleCollider.height/2 - capsuleCollider.radius);
+    Vector3 p2 = p1 +  Vector3.up  * capsuleCollider.height;
+    return Physics.CapsuleCast( p1,p2 ,capsuleCollider.radius, Vector3.down, out groundHit,0.05f,
                               layerMask);
   }
 
-  private void handleJump() {
-     isJumped = true;
+  private void HandleJump() {
+     if(isGround && isJumpedPress) {
+        isJumping = true;
+        velocity.y = 10f;
+     } else if (!isJumpedPress && isJumping && isGround ){
+        isJumping = false;
+     }
+  }
 
+
+  private void handleAnimation() {
+    bool isRunning = anim.GetBool(isRuningHash);
+    bool isJumpingAni = anim.GetBool(isJumpingHash);
+        Debug.Log(isRunning);
+    if(isMovePressed  && !isRunning) {
+        anim.SetBool(isRuningHash, true);
+    }
+    if(!isMovePressed && isRunning) {
+        anim.SetBool(isRuningHash, false);
+    }
+
+    if(isJumpedPress  && !isJumpingAni && isJumping) {
+        anim.SetBool(isJumpingHash, true);
+    }
+
+    if(!isJumpedPress  && isJumpingAni && !isJumping) {
+        anim.SetBool(isJumpingHash, true);
+    }
+  }
+  void handleParticle() {
+    counter += Time.deltaTime;
+   if(isMovePressed && !isJumping){
+     if(counter > 0.05){
+        _moveParticle.Play();
+        counter = 0;
+     }
+   }
+  }
+
+  void Jump() {
+    isJumpedPress = true;
   }
   void InputMovement() {
     InputX = Input.GetAxis("Horizontal");
     InputZ = Input.GetAxis("Vertical");
 
     float Speed = new Vector2(InputX, InputZ).sqrMagnitude;
-    //float allowPlayerRotation = 5f;
-//	if (Speed > allowPlayerRotation) {
-//			anim.SetFloat ("Blend", Speed, 0.5f, Time.deltaTime);
-//		} else if (Speed < allowPlayerRotation) {
-//			anim.SetFloat ("Blend", Speed, 0.3f, Time.deltaTime);
-//	}
-    if(Input.GetKey("space")){
-        handleJump();
+
+
+    isMovePressed  = Speed > 0;
+    if(Input.GetKeyDown("space")){
+        Jump();
         Debug.Log("jump");
+    }
+    if(Input.GetKeyUp("space")){
+        isJumpedPress = false;
     }
   }
 }
