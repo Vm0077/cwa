@@ -220,7 +220,7 @@ namespace KinematicCharacterController.Examples
 
         /// <summary>
         /// (Called by KinematicCharacterMotor during its update cycle)
-        /// This is where you tell your character what its rotation should be right now. 
+        /// This is where you tell your character what its rotation should be right now.
         /// This is the ONLY place where you should set the character's rotation
         /// </summary>
         public void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
@@ -275,7 +275,7 @@ namespace KinematicCharacterController.Examples
 
         /// <summary>
         /// (Called by KinematicCharacterMotor during its update cycle)
-        /// This is where you tell your character what its velocity should be right now. 
+        /// This is where you tell your character what its velocity should be right now.
         /// This is the ONLY place where you can set the character's velocity
         /// </summary>
         public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
@@ -364,7 +364,7 @@ namespace KinematicCharacterController.Examples
                                     jumpDirection = Motor.GroundingStatus.GroundNormal;
                                 }
 
-                                // Makes the character skip ground probing/snapping on its next update. 
+                                // Makes the character skip ground probing/snapping on its next update.
                                 // If this line weren't here, the character would remain snapped to the ground when trying to jump. Try commenting this line out and see.
                                 Motor.ForceUnground();
 

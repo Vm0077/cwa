@@ -3,69 +3,67 @@ using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
 
-public class CharacterStateMachine : StateMachine<CharacterStateMachine.CharacterState>, ICharacterController
+public enum CharacterState {
+    // Ground
+   Idle,
+   Running,
+   Crouching,
+    // Airborne,
+   Jumping,
+   Falling,
+}
+public class CharacterStateMachine :MonoBehaviour, IStateMachine
 {
-
+    Dictionary <CharacterState, CharacterBaseState> states  = new Dictionary<CharacterState,CharacterBaseState> ();
     CharacterContext _context;
-    [SerializeField] KinematicCharacterMotor motor;
-    public enum CharacterState{
-        Grounded,
-        Air,
+    CharacterBaseState CurrentState;
+    CharacterState currentKey;
+    CharacterState previousKey;
+    public KinematicCharacterMotor motor;
+    public Animator animator;
+    bool isTransitioning = false;
+
+    void InitializeState(){
+        states.Add(CharacterState.Idle, new IdleState(_context));
+        states.Add(CharacterState.Running, new RunState(_context));
+        states.Add(CharacterState.Crouching, new CrouchState(_context));
+
+        states.Add(CharacterState.Jumping, new JumpState(_context));
+        states.Add(CharacterState.Falling, new FallState(_context));
+        CurrentState = states[CharacterState.Idle];
+        currentKey = CharacterState.Idle;
+        previousKey = CharacterState.Idle;
     }
 
+    public void TransitionToState(CharacterState key){
+       isTransitioning = true;
+       CurrentState.ExitState();
+       CurrentState = states[key];
+       CurrentState.EnterState();
+       _context.Motor.CharacterController = CurrentState;
+       isTransitioning = false;
+    }
+
+    public void UpdateState(){
+        previousKey = currentKey;
+        currentKey = CurrentState.GetNextState();
+        Debug.Log(currentKey);
+        if(isTransitioning) return;
+        if(!currentKey.Equals(previousKey)){
+            TransitionToState(currentKey);
+        }
+    }
     void Awake() {
-      _context = new CharacterContext(motor);
-      CurrrentStates = new GroundState(CharacterState.Grounded);
-      motor.CharacterController = (ICharacterController) CurrrentStates;
+        _context = new CharacterContext(motor, animator);
+        InitializeState();
+        motor.CharacterController = states[CharacterState.Idle];
     }
-
-    public void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
-    {
-        throw new System.NotImplementedException();
+    void Update() {
+        UpdateState();
     }
-
-    public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void BeforeCharacterUpdate(float deltaTime)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void PostGroundingUpdate(float deltaTime)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void AfterCharacterUpdate(float deltaTime)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public bool IsColliderValidForCollisions(Collider coll)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnGroundHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnDiscreteCollisionDetected(Collider hitCollider)
-    {
-        throw new System.NotImplementedException();
+    public void SetInputs(ref PlayerCharacterInputs inputs){
+        if(CurrentState == null) Debug.Log("it is null");
+        CurrentState.SetInputs(ref inputs);
     }
 }
+

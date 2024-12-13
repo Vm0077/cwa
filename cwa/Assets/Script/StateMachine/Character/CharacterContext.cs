@@ -3,20 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
 
-public class CharacterContext: MonoBehaviour
+public class CharacterContext
 {
-    KinematicCharacterMotor motor;
-    public CharacterContext(KinematicCharacterMotor motor){
-        this.motor = motor;
-    }
-
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
+    public KinematicCharacterMotor Motor;
+    public Animator animator;
+    public bool isJumpPressed = false;
+    public Vector3 currentVelocity;
+    public PlayerCharacterInputs inputs;
+    public CharacterContext(KinematicCharacterMotor motor, Animator animator){
+        this.Motor = motor;
+        this.animator = animator;
     }
 }
