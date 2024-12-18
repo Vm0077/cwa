@@ -15,7 +15,6 @@ public class GroundState : CharacterBaseState
         _context = context;
     }
 
-
     public override void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
     {
 
@@ -34,7 +33,6 @@ public class GroundState : CharacterBaseState
 
         // Smooth movement Velocity
         currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1f - Mathf.Exp(-StableMovementSharpness * deltaTime));
-
     }
 
     public override void SetInputs(ref PlayerCharacterInputs inputs)
@@ -48,7 +46,11 @@ public class GroundState : CharacterBaseState
             cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.up, _context.Motor.CharacterUp).normalized;
         }
         Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, _context.Motor.CharacterUp);
-        _moveInputVector = moveInputVector;
+
+        _moveInputVector = cameraPlanarRotation * moveInputVector;
+        if(inputs.JumpDown){
+            _context._jumpRequested  = true;
+        }
     }
 
     public override void EnterState()
@@ -70,6 +72,7 @@ public class GroundState : CharacterBaseState
 
     public override void AfterCharacterUpdate(float deltaTime)
     {
+
     }
 
     public override void BeforeCharacterUpdate(float deltaTime)
@@ -107,11 +110,11 @@ public class GroundState : CharacterBaseState
 
     public override CharacterState GetNextState()
     {
-        if(!_context.Motor.GroundingStatus.IsStableOnGround){
-            return CharacterState.Falling;
-        }
-        if(_context.isJumpPressed){
+        if(_context._jumpRequested){
             return CharacterState.Jumping;
+        }
+        if(!_context.Motor.GroundingStatus.FoundAnyGround){
+            return CharacterState.Falling;
         }
         if(_moveInputVector.sqrMagnitude > 0) {
             return CharacterState.Running;

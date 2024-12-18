@@ -6,12 +6,13 @@ using KinematicCharacterController;
 public class CharacterContext
 {
     public KinematicCharacterMotor Motor;
-    public Animator animator;
-    public bool isJumpPressed = false;
+    public bool _jumpRequested = false;
     public Vector3 currentVelocity;
+    public Vector3 _lookInputVector;
     public PlayerCharacterInputs inputs;
-    public CharacterContext(KinematicCharacterMotor motor, Animator animator){
+    public CharacterAnimationController animationController;
+    public CharacterContext(KinematicCharacterMotor motor, CharacterAnimationController characterAnimation){
         this.Motor = motor;
-        this.animator = animator;
+        this.animationController = characterAnimation;
     }
 }

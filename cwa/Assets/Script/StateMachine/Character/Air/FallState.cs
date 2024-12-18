@@ -7,10 +7,7 @@ public class FallState :AirborneState
 {
 
     CharacterContext _context;
-    public float MaxStableMoveSpeed = 10f;
-    public float StableMovementSharpness = 15f;
-    Vector3 _moveInputVector;
-    Vector3 Gravity = new Vector3(0, -30f, 0);
+    Vector3 _jumpToFallGravity = new Vector3(0,-30f,0);
 
     public FallState(CharacterContext context):base(context)
     {
@@ -19,17 +16,21 @@ public class FallState :AirborneState
 
     public override void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
     {
+        base.UpdateVelocity(ref currentVelocity, deltaTime);
         currentVelocity += Gravity * deltaTime;
     }
 
     public override void EnterState()
     {
-
+        Gravity = _jumpToFallGravity;
+        _context.animationController.animator.SetBool(_context.animationController.falling, true);
     }
+
 
     public override void ExitState()
     {
-
+        base.ExitState();
+        _context.animationController.animator.SetBool(_context.animationController.falling, false);
     }
 
     public override void UpdateState()
@@ -87,5 +88,17 @@ public class FallState :AirborneState
 
     public override void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport)
     {
+    }
+
+    public override CharacterState GetNextState()
+    {
+        if(_context.Motor.GroundingStatus.FoundAnyGround){
+            if(_moveInputVector.sqrMagnitude > 0){
+                Debug.Log("nice");
+                return CharacterState.Running;
+            }
+            return CharacterState.Idle;
+        }
+        return CharacterState.Falling;
     }
 }

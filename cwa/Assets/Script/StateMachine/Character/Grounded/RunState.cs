@@ -7,7 +7,8 @@ public class RunState : GroundState
 {
     CharacterContext _context;
     Vector3 Gravity = new Vector3(0f, -30f, 0f);
-
+    Vector3 smoothedLookInputDirection;
+    float OrientationSharpness = 10f;
     public RunState(CharacterContext context) : base(context)
     {
         _context = context;
@@ -15,37 +16,37 @@ public class RunState : GroundState
 
     public override void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
     {
-    // if (_lookInputVector.sqrMagnitude > 0f && OrientationSharpness > 0f)
-    // {
-    //     // Smoothly interpolate from current to target look direction
-    //     Vector3 smoothedLookInputDirection = Vector3.Slerp(Motor.CharacterForward, _lookInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
-
-    //     // Set the current rotation (which will be used by the KinematicCharacterMotor)
-    //     currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, Motor.CharacterUp);
-    // }
-
+        if (_context._lookInputVector.sqrMagnitude > 0f && OrientationSharpness > 0f)
+        {
+            // Smoothly interpolate from current to target look direction
+            smoothedLookInputDirection = Vector3.Slerp(_context.Motor.CharacterForward, _context._lookInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
+            // Set the current rotation (which will be used by the KinematicCharacterMotor)
+            currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, _context.Motor.CharacterUp);
+        }
     }
-    public override void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
+
+    public override void SetInputs(ref PlayerCharacterInputs inputs)
     {
-        base.UpdateVelocity(ref currentVelocity, deltaTime);
+        base.SetInputs(ref inputs);
+        _context._lookInputVector = _moveInputVector.normalized;
     }
-
 
     public override void EnterState()
     {
         base.EnterState();
-        _context.animator.SetBool("Running", true);
+        _context.animationController.animator.SetBool(_context.animationController.running, true);
     }
 
     public override void ExitState()
     {
         base.ExitState();
-        _context.animator.SetBool("Running", false);
     }
 
     public override void UpdateState()
     {
-
+        // check if the vector on the right or left side;
+        Vector3 turn = Vector3.Cross(_context.Motor.CharacterForward,_context._lookInputVector);
+        _context.animationController.SetRunVelocity(new Vector3(turn.y,0,1));
     }
 
 

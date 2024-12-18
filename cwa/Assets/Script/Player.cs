@@ -13,7 +13,8 @@ public struct PlayerCharacterInputs {
 }
 
 public class Player : MonoBehaviour {
-  public CharacterStateMachine Character;
+  public CharacterStateMachine CharacterMovement;
+  public CharacterAnimationController AnimationController;
   private const string MouseXInput = "Mouse X";
   private const string MouseYInput = "Mouse Y";
   private const string MouseScrollInput = "Mouse ScrollWheel";
@@ -44,6 +45,6 @@ public class Player : MonoBehaviour {
     characterInputs.JumpDown = Input.GetKeyDown(KeyCode.Space);
     characterInputs.CrouchDown = Input.GetKeyDown(KeyCode.C);
     characterInputs.CrouchUp = Input.GetKeyUp(KeyCode.C);
-    Character.SetInputs(ref characterInputs);
+    CharacterMovement.SetInputs(ref characterInputs);
   }
 }

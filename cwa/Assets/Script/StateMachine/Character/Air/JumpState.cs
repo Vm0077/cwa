@@ -7,29 +7,61 @@ public class JumpState : AirborneState
 {
     CharacterContext _context;
     Vector3 _moveInputVector;
-    Vector3 Gravity = new Vector3(0, -30f, 0);
+    bool _jumpConsumed = false;
+    bool _jumpedThisFrame = false;
+    float JumpUpSpeed = 10f;
+    float _maxJumpHeight = 5f;
+    float _maxJumpTime = 0.5f;
+    float _jumpInitialVelocity;
 
-    public JumpState(CharacterContext context):base(context)
+    public JumpState(CharacterContext context) : base(context)
     {
         _context = context;
     }
 
-    public override void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
-    {
-
+    public void SetUpJumpVariable () {
+        float timeToApex =  _maxJumpTime /2;
+        float _gravity = (-2 * _maxJumpHeight)/ Mathf.Pow(timeToApex,2);
+        Gravity = new Vector3(0, _gravity, 0);
+        _jumpInitialVelocity =  (2*_maxJumpHeight) / timeToApex;
     }
-
     public override void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
     {
-        currentVelocity += Gravity * deltaTime;
+        base.UpdateVelocity(ref currentVelocity, deltaTime);
+        _jumpedThisFrame = false;
+        if (_context._jumpRequested)
+        {
+            if(!_jumpConsumed){
+                Vector3 jumpDirection = _context.Motor.CharacterUp;
+                // See if we actually are allowed to jump
+                // Calculate jump direction before ungrounding
+                if (_context.Motor.GroundingStatus.FoundAnyGround && !_context.Motor.GroundingStatus.IsStableOnGround)
+                {
+                    jumpDirection = _context.Motor.GroundingStatus.GroundNormal;
+                }
+
+                // Makes the character skip ground probing/snapping on its next update.
+                // If this line weren't here, the character would remain snapped to the ground when trying to jump. Try commenting this line out and see.
+                _context.Motor.ForceUnground();
+
+                currentVelocity += (jumpDirection * _jumpInitialVelocity) - Vector3.Project(currentVelocity, _context.Motor.CharacterUp);
+                _context._jumpRequested = false;
+               _jumpConsumed = true;
+
+            }
+        }
+        currentVelocity += Gravity * Time.deltaTime;
     }
 
     public override void EnterState()
     {
+        SetUpJumpVariable();
+        _context.animationController.animator.SetBool(_context.animationController.jumping, true);
     }
 
     public override void ExitState()
     {
+        _context.animationController.animator.SetBool(_context.animationController.jumping, false);
     }
 
     public override void UpdateState()
@@ -54,15 +86,29 @@ public class JumpState : AirborneState
 
     public override void InitializeSubState()
     {
-
     }
 
     public override void AfterCharacterUpdate(float deltaTime)
     {
+        if (_context._jumpRequested)
+        {
+            _context._jumpRequested = false;
+        }
+        if(!_jumpedThisFrame){
+            _jumpConsumed = false;
+        }
     }
 
     public override void BeforeCharacterUpdate(float deltaTime)
     {
+    }
+
+    public override CharacterState GetNextState()
+    {
+        if(_context.Motor.Velocity.y < 0){
+            return CharacterState.Falling;
+        }
+        return CharacterState.Jumping;
     }
 
     public override bool IsColliderValidForCollisions(Collider coll)

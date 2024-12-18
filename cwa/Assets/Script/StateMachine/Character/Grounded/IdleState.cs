@@ -15,6 +15,7 @@ public class IdleState : GroundState
     public override void EnterState()
     {
         base.EnterState();
+        _context.animationController.animator.SetBool(_context.animationController.running, false);
     }
 
     public override void ExitState()
