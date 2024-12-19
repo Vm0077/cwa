@@ -700,6 +700,7 @@ GameObject:
   - component: {fileID: 372754637}
   - component: {fileID: 372754639}
   - component: {fileID: 372754640}
+  - component: {fileID: 372754641}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -827,6 +828,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24c23562bf73d64aea262d332f9f3003, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _context: {fileID: 372754641}
   motor: {fileID: 372754637}
   text: {fileID: 101726871}
   AnimationController: {fileID: 372754640}
@@ -850,6 +852,25 @@ MonoBehaviour:
   jumping: 0
   idle: 0
   falling: 0
+--- !u!114 &372754641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 372754631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 967ab093f04f927008e4f9a0c7838032, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Motor: {fileID: 0}
+  _jumpRequested: 0
+  currentVelocity: {x: 0, y: 0, z: 0}
+  jumpCount: 0
+  jumpCountMax: 0
+  _lookInputVector: {x: 0, y: 0, z: 0}
+  animationController: {fileID: 0}
 --- !u!1 &515112954
 GameObject:
   m_ObjectHideFlags: 0

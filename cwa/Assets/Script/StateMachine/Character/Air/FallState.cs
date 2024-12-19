@@ -31,6 +31,7 @@ public class FallState :AirborneState
     {
         base.ExitState();
         _context.animationController.animator.SetBool(_context.animationController.falling, false);
+        _context.JumpCountResetStart();
     }
 
     public override void UpdateState()

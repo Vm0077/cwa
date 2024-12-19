@@ -28,18 +28,21 @@ public class RunState : GroundState
     public override void SetInputs(ref PlayerCharacterInputs inputs)
     {
         base.SetInputs(ref inputs);
+
         _context._lookInputVector = _moveInputVector.normalized;
     }
 
     public override void EnterState()
     {
         base.EnterState();
+        _context.animationController.animator.speed = 2.0f;
         _context.animationController.animator.SetBool(_context.animationController.running, true);
     }
 
     public override void ExitState()
     {
         base.ExitState();
+
     }
 
     public override void UpdateState()

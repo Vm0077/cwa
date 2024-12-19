@@ -15,7 +15,7 @@ public enum CharacterState {
 public class CharacterStateMachine :MonoBehaviour, IStateMachine
 {
     Dictionary <CharacterState, CharacterBaseState> states  = new Dictionary<CharacterState,CharacterBaseState>();
-    CharacterContext _context;
+    public CharacterContext _context;
     CharacterBaseState CurrentState;
     CharacterState currentKey;
     CharacterState previousKey;
@@ -57,7 +57,8 @@ public class CharacterStateMachine :MonoBehaviour, IStateMachine
         }
     }
     void Awake() {
-        _context = new CharacterContext(motor, AnimationController);
+        _context.Motor = motor;
+        _context.animationController = AnimationController;
         InitializeState();
         motor.CharacterController = states[CharacterState.Idle];
     }
@@ -68,5 +69,10 @@ public class CharacterStateMachine :MonoBehaviour, IStateMachine
     public void SetInputs(ref PlayerCharacterInputs inputs){
         CurrentState.SetInputs(ref inputs);
     }
+
+    public void  AssignStartCoroutine(IEnumerator routine){
+            StartCoroutine(routine);
+    }
+
 }
 
