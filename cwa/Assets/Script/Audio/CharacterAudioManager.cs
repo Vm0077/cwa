@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class CharacterAudioManager : MonoBehaviour
 {
-    [SerializeField] AudioSource musicSource;
-    [SerializeField] CharacterStateMachine stateMachine;
+    [SerializeField] AudioSource SFXSource;
+    [SerializeField] CharacterMovementStateMachine stateMachine;
     public AudioClip JumpSound1;
     public AudioClip JumpSound2;
     void Start()
@@ -22,16 +22,18 @@ public class CharacterAudioManager : MonoBehaviour
         switch (stateMachine._context.jumpCount) {
             case 1 :
             case 2 :{
-                musicSource.clip = JumpSound1;
+                SFXSource.clip = JumpSound1;
                 break;
             }
             case 3 :{
-                musicSource.clip = JumpSound2;
+                SFXSource.clip = JumpSound2;
+                Debug.Log("play 2");
                 break;
             }
-
-
+            default :{
+                break;
+            }
         }
-        musicSource.Play();
+        SFXSource.Play();
     }
 }

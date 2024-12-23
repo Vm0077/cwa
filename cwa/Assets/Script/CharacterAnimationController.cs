@@ -14,6 +14,7 @@ public class CharacterAnimationController : MonoBehaviour
     public int jumping;
     public int idle;
     public int falling;
+    public int crouch;
     void SetUpHashAnimation()
     {
         running = Animator.StringToHash("Running");
@@ -23,6 +24,7 @@ public class CharacterAnimationController : MonoBehaviour
         idle = Animator.StringToHash("Idle");
         falling = Animator.StringToHash("Falling");
         jumpCount = Animator.StringToHash("JumpCount");
+        crouch = Animator.StringToHash("Crouch");
     }
 
     void Start()
@@ -36,13 +38,7 @@ public class CharacterAnimationController : MonoBehaviour
 
     }
 
-    public void SetState()
-    {
-        animator.SetFloat(velocityZanim, 0);
-        animator.SetFloat(velocityXanim, 0);
-    }
-
-    public void SetRunVelocity(Vector3 vector)
+     public void SetRunVelocity(Vector3 vector)
     {
         animator.SetFloat(velocityZanim, vector.z);
         animator.SetFloat(velocityXanim, vector.x);

@@ -13,7 +13,7 @@ public struct PlayerCharacterInputs {
 }
 
 public class Player : MonoBehaviour {
-  public CharacterStateMachine CharacterMovement;
+  public CharacterMovementStateMachine CharacterMovement;
   public CharacterAnimationController AnimationController;
   private const string MouseXInput = "Mouse X";
   private const string MouseYInput = "Mouse Y";
@@ -37,14 +37,13 @@ public class Player : MonoBehaviour {
   }
 
   private void HandleCharacterInput() {
-    PlayerCharacterInputs characterInputs = new PlayerCharacterInputs();
-    // Build the CharacterInputs struct
-    characterInputs.MoveAxisForward = Input.GetAxisRaw(VerticalInput);
-    characterInputs.MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
-    characterInputs.CameraRotation = Camera.main.transform.rotation;
-    characterInputs.JumpDown = Input.GetKeyDown(KeyCode.Space);
-    characterInputs.CrouchDown = Input.GetKeyDown(KeyCode.C);
-    characterInputs.CrouchUp = Input.GetKeyUp(KeyCode.C);
-    CharacterMovement.SetInputs(ref characterInputs);
+    CharacterMovement._context.inputs = new PlayerCharacterInputs();
+    CharacterMovement._context.inputs.MoveAxisForward = Input.GetAxisRaw(VerticalInput);
+    CharacterMovement._context.inputs.MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
+    CharacterMovement._context.inputs.CameraRotation = Camera.main.transform.rotation;
+    CharacterMovement._context.inputs.JumpDown = Input.GetKeyDown(KeyCode.Space);
+    CharacterMovement._context.inputs.CrouchDown = Input.GetKeyDown(KeyCode.C);
+    CharacterMovement._context.inputs.CrouchUp = Input.GetKeyUp(KeyCode.C);
+    CharacterMovement.SetInputs(ref  CharacterMovement._context.inputs);
   }
 }
