@@ -8,6 +8,7 @@ public enum CharacterState {
    Idle,
    Running,
    Crouching,
+   Attack,
     // Airborne,
    Jumping,
    Falling,
@@ -31,6 +32,7 @@ public class CharacterMovementStateMachine :MonoBehaviour, IStateMachine
         states.Add(CharacterState.Crouching, new CrouchState(_context));
         states.Add(CharacterState.Jumping, new JumpState(_context));
         states.Add(CharacterState.Falling, new FallState(_context));
+        states.Add(CharacterState.Attack, new AttackState(_context));
         CurrentState = states[CharacterState.Idle];
         currentKey = CharacterState.Idle;
         previousKey = CharacterState.Idle;

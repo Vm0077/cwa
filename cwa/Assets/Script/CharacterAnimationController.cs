@@ -12,9 +12,13 @@ public class CharacterAnimationController : MonoBehaviour
     public int velocityZanim;
     public int jumpCount;
     public int jumping;
+    public int attack;
     public int idle;
     public int falling;
     public int crouch;
+
+
+    public int attackCount;
     void SetUpHashAnimation()
     {
         running = Animator.StringToHash("Running");
@@ -25,6 +29,8 @@ public class CharacterAnimationController : MonoBehaviour
         falling = Animator.StringToHash("Falling");
         jumpCount = Animator.StringToHash("JumpCount");
         crouch = Animator.StringToHash("Crouch");
+        attackCount = Animator.StringToHash("AttackCount");
+        attack = Animator.StringToHash("Attacking");
     }
 
     void Start()
@@ -47,5 +53,12 @@ public class CharacterAnimationController : MonoBehaviour
     public void SetJumpCount(int count)
     {
         animator.SetInteger(jumpCount, count);
+    }
+
+    public void Attack(){
+        animator.SetTrigger(attack);
+    }
+    public void SetAttactCount(int count){
+        animator.SetInteger(attackCount,count);
     }
 }

@@ -10,6 +10,7 @@ public class CharacterMovementContext : MonoBehaviour
     public Vector3 currentVelocity;
     public int jumpCount = 0;
     public int jumpCountMax = 3;
+
     public Vector3 _lookInputVector;
     public PlayerCharacterInputs inputs;
     public CharacterAnimationController animationController;
@@ -34,6 +35,7 @@ public class CharacterMovementContext : MonoBehaviour
             StopCoroutine(jumpCountRoutine);
         }
     }
+
     void Awake () {
       jumpCountMax = 3;
     }

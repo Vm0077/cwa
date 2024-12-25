@@ -50,6 +50,9 @@ public class GroundState : CharacterMovementBaseState
         if(inputs.JumpDown){
             _context._jumpRequested  = true;
         }
+        if(inputs.AttackPressed){
+           _context.inputs.AttackPressed =true;
+        }
     }
 
     public override void EnterState()
@@ -109,6 +112,9 @@ public class GroundState : CharacterMovementBaseState
 
     public override CharacterState GetNextState()
     {
+        if(_context.inputs.AttackPressed){
+            return CharacterState.Attack;
+        }
         if(_context._jumpRequested){
             return CharacterState.Jumping;
         }

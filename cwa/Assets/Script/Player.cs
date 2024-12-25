@@ -7,6 +7,7 @@ public struct PlayerCharacterInputs {
   public float MoveAxisForward;
   public float MoveAxisRight;
   public Quaternion CameraRotation;
+  public bool AttackPressed;
   public bool JumpDown;
   public bool CrouchDown;
   public bool CrouchUp;
@@ -44,6 +45,7 @@ public class Player : MonoBehaviour {
     CharacterMovement._context.inputs.JumpDown = Input.GetKeyDown(KeyCode.Space);
     CharacterMovement._context.inputs.CrouchDown = Input.GetKeyDown(KeyCode.C);
     CharacterMovement._context.inputs.CrouchUp = Input.GetKeyUp(KeyCode.C);
+    CharacterMovement._context.inputs.AttackPressed = Input.GetMouseButtonDown(0);
     CharacterMovement.SetInputs(ref  CharacterMovement._context.inputs);
   }
 }
