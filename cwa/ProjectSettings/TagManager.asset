@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PlayerEyes
   - Collectable
+  - coin
   layers:
   - Default
   - TransparentFX

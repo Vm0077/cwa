@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
-
 public class CharacterMovementContext : MonoBehaviour
 {
     public KinematicCharacterMotor Motor;
@@ -31,7 +30,6 @@ public class CharacterMovementContext : MonoBehaviour
     }
     public void JumpCountResetStop(){
         if( jumpCount < jumpCountMax && jumpCountRoutine != null){
-            Debug.Log("stop it");
             StopCoroutine(jumpCountRoutine);
         }
     }
@@ -39,5 +37,4 @@ public class CharacterMovementContext : MonoBehaviour
     void Awake () {
       jumpCountMax = 3;
     }
-
 }
