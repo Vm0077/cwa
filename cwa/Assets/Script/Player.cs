@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using KinematicCharacterController;
+using System.Runtime.InteropServices;
 public struct PlayerCharacterInputs {
   public float MoveAxisForward;
   public float MoveAxisRight;
@@ -13,6 +14,7 @@ public struct PlayerCharacterInputs {
   public bool CrouchUp;
 }
 
+
 public class Player : MonoBehaviour {
   public CharacterMovementStateMachine CharacterMovement;
   public CharacterAnimationController AnimationController;
@@ -22,6 +24,10 @@ public class Player : MonoBehaviour {
   private const string HorizontalInput = "Horizontal";
   private const string VerticalInput = "Vertical";
 
+
+  uint life = 3;
+  uint coin = 0;
+  uint star = 0;
   private void Start() {
   }
 
@@ -47,5 +53,24 @@ public class Player : MonoBehaviour {
     CharacterMovement._context.inputs.CrouchUp = Input.GetKeyUp(KeyCode.C);
     CharacterMovement._context.inputs.AttackPressed = Input.GetMouseButtonDown(0);
     CharacterMovement.SetInputs(ref  CharacterMovement._context.inputs);
+  }
+  public void CollectCoin (){
+      this.coin += 1;
+  }
+  public void CollectHeart (){
+      this.life += 1;
+  }
+  public void CollectStar (){
+      this.star += 1;
+  }
+  public void DropCoin (uint coin){
+      if (coin <  0) return;
+      this.coin -= coin;
+  }
+
+  void SetUpCollectableEvent() {
+    Coin.OnCoinCollected += CollectCoin;
+    Heart.OnHeartCollected += CollectHeart;
+    Star.OnStarCollected += CollectStar;
   }
 }

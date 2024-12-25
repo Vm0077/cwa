@@ -32,7 +32,6 @@ public class CharacterAnimationController : MonoBehaviour
         attackCount = Animator.StringToHash("AttackCount");
         attack = Animator.StringToHash("Attacking");
     }
-
     void Start()
     {
         SetUpHashAnimation();
