@@ -6,6 +6,24 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MoonlightStudios/Simple Cartoon Enviroment Pack/Demo_Scene/Demo_Scene.unity
-    guid: 7fc4803aa8b9fa144b95b634319cce5a
+    path: Assets/Scenes/Prototype/StartScreenPrototype.unity
+    guid: 35ef558ba8a6bb4daa51a48ff07463e2
+  - enabled: 1
+    path: Assets/Scenes/Prototype/DeadScene.unity
+    guid: 2ee7354e2599094019b65520783ce45a
+  - enabled: 1
+    path: Assets/Scenes/Prototype/HubWorld-1.unity
+    guid: 581b6050003c42e00949cde7631f3788
+  - enabled: 1
+    path: Assets/Scenes/Prototype/PersistenceGamplay.unity
+    guid: c07ac8ca4085ced039a5b3b3669c3cee
+  - enabled: 1
+    path: Assets/Scenes/Prototype/PlayerControllerPrototype.unity
+    guid: 895fcdb8a4c62f370b25e5c365406778
+  - enabled: 1
+    path: Assets/Scenes/Prototype/ResultScreen.unity
+    guid: 1f6fd7c9b87cc42a59c33f3d91511c23
+  - enabled: 1
+    path: Assets/Scenes/Prototype/SceneManger-1.unity
+    guid: be85aa2e59c89f8bd991f7aa09cf206c
   m_configObjects: {}

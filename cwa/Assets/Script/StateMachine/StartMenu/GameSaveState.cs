@@ -28,5 +28,17 @@ public class GameSaveState :  StartMenuState
 
     public override void UpdateState()
     {
+
+    }
+    public void CreateNewSave() {
+
+    }
+
+    public void DeleteSaveFile() {
+
+    }
+
+    public void StartSave() {
+
     }
 }

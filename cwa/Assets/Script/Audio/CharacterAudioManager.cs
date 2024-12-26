@@ -8,14 +8,25 @@ public class CharacterAudioManager : MonoBehaviour
     [SerializeField] CharacterMovementStateMachine stateMachine;
     public AudioClip JumpSound1;
     public AudioClip JumpSound2;
+    public AudioClip CoinSound;
+    public AudioClip HeartSound;
+    public AudioClip StarSound;
     void Start()
     {
-
+        SetUpEvent();
     }
 
     void Update()
     {
 
+    }
+
+    void ItemCollected () {
+        SFXSource.clip = CoinSound;
+        SFXSource.Play();
+    }
+    void SetUpEvent () {
+        Coin.OnCoinCollected += ItemCollected;
     }
 
     void JumpSound(){

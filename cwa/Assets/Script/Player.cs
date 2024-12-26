@@ -25,9 +25,12 @@ public class Player : MonoBehaviour {
   private const string VerticalInput = "Vertical";
 
 
-  uint life = 3;
-  uint coin = 0;
-  uint star = 0;
+  public uint life = 3;
+  public uint coin = 0;
+  public uint star = 0;
+  private void Awake() {
+    SetUpCollectableEvent();
+  }
   private void Start() {
   }
 
@@ -72,5 +75,10 @@ public class Player : MonoBehaviour {
     Coin.OnCoinCollected += CollectCoin;
     Heart.OnHeartCollected += CollectHeart;
     Star.OnStarCollected += CollectStar;
+  }
+
+  public void Respawn(Transform transform){
+     CharacterMovement.motor.SetPosition(transform.position);
+     CharacterMovement.motor.SetRotation(transform.rotation);
   }
 }
