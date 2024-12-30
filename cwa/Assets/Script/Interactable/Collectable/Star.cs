@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Star : MonoBehaviour,ICollectable
 {
-    public static event Action OnStarCollected; 
+    public static event Action OnStarCollected;
     public void Collect()
     {
         OnStarCollected?.Invoke();

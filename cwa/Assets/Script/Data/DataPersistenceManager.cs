@@ -49,15 +49,14 @@ public class DataPersistenceManager : MonoBehaviour
 
         InitializeSelectedProfileId();
     }
-
     private void OnEnable()
     {
-       // SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
-        //SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -91,6 +90,10 @@ public class DataPersistenceManager : MonoBehaviour
         LoadGame();
     }
 
+    public void DeleteAllData(){
+        dataHandler.DeleteAll();
+    }
+
     private void InitializeSelectedProfileId()
     {
         this.selectedProfileId = dataHandler.GetMostRecentlyUpdatedProfileId();
@@ -106,6 +109,7 @@ public class DataPersistenceManager : MonoBehaviour
         this.gameData = new GameData();
     }
 
+
     public void LoadGame()
     {
         // return right away if data persistence is disabled
@@ -113,7 +117,6 @@ public class DataPersistenceManager : MonoBehaviour
         {
             return;
         }
-
         // load any saved data from a file using the data handler
         this.gameData = dataHandler.Load(selectedProfileId);
 
@@ -134,6 +137,7 @@ public class DataPersistenceManager : MonoBehaviour
         foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
         {
             dataPersistenceObj.LoadData(gameData);
+            Debug.Log("loaded");
         }
     }
 

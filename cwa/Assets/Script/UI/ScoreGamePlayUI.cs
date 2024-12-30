@@ -27,7 +27,4 @@ public class ScoreGamePlayUI : MonoBehaviour {
   void UpdateStar() {
     this.StarText.text = player.star.ToString()+ "x";
   }
-  void UpdateTime() {
-
-  }
 }

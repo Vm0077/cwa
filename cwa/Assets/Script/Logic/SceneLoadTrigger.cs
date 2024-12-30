@@ -5,31 +5,43 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneLoadTrigger : MonoBehaviour{
+    [Header("Spawn To")] private Transform position;
     [SerializeField] private SceneField[] _sceneToLoad;
     [SerializeField] private SceneField[] _sceneToUnload;
 
-    private void OnTriggerEnter(Collider other) {
+    public void Interace() {
+
+    }
+    void OnTriggerEnter(Collider other) {
         if(other.CompareTag("Player")){
             LoadScene();
             UnloadScene();
         }
     }
-    private void LoadScene() {
-        bool isSceneLoaded = false;
-        for(int i = 0;i < _sceneToUnload.Length; i++) {
-            for(int j = 0;j < SceneManager.sceneCount; j++) {
-                Scene loadScene = SceneManager.GetSceneAt(j);
-                if(loadScene.name == _sceneToLoad[i].SceneName){
-                   isSceneLoaded = true;
-                   break;
+
+    private void LoadScene () {
+        for(int i = 0 ;  i < _sceneToLoad.Length ; i++ ){
+            bool isSceneLoaded = false;
+            for(int j = 0 ;  j < SceneManager.sceneCount ; j++ ){
+                Scene loadedScene = SceneManager.GetSceneAt(j);
+                if(loadedScene.name == _sceneToLoad[i].SceneName){
+                    isSceneLoaded = true;
+                    break;
                 }
             }
             if(!isSceneLoaded){
-                SceneManager.LoadSceneAsync(_sceneToLoad[i],LoadSceneMode.Additive);
+                SceneManager.LoadSceneAsync(_sceneToLoad[i], LoadSceneMode.Additive);
             }
         }
     }
-    private void UnloadScene() {
-
+    private void UnloadScene () {
+        for(int i = 0 ;  i < _sceneToLoad.Length ; i++ ){
+            for(int j = 0 ;  j < SceneManager.sceneCount ; j++ ){
+                Scene loadedScene = SceneManager.GetSceneAt(j);
+                if(loadedScene.name == _sceneToUnload[i].SceneName){
+                    SceneManager.UnloadSceneAsync(_sceneToUnload[i]);
+                }
+            }
+        }
     }
 }

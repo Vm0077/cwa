@@ -37,6 +37,7 @@ public class GroundState : CharacterMovementBaseState
 
     public override void SetInputs(ref PlayerCharacterInputs inputs)
     {
+        Debug.Log(_context.allowToMove);
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(inputs.MoveAxisRight, 0f, inputs.MoveAxisForward), 1f);
         // Calculate camera direction and rotation on the character plane
         Vector3 cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.forward, _context.Motor.CharacterUp).normalized;
@@ -112,6 +113,9 @@ public class GroundState : CharacterMovementBaseState
 
     public override CharacterState GetNextState()
     {
+        if(!_context.allowToMove) {
+            return CharacterState.Idle;
+        }
         if(_context.inputs.AttackPressed){
             return CharacterState.Attack;
         }
@@ -136,6 +140,7 @@ public class GroundState : CharacterMovementBaseState
 
     public override void onTriggerStay(Collider other)
     {
+
     }
 
     public override void onTriggerExit(Collider other)

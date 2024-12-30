@@ -161,6 +161,9 @@ public class FileDataHandler
                 + profileId + " at path: " + fullPath + "\n" + e);
         }
     }
+    public void DeleteAll() {
+            Directory.Delete(Path.GetDirectoryName(dataDirPath), true);
+    }
 
     public Dictionary<string, GameData> LoadAllProfiles()
     {

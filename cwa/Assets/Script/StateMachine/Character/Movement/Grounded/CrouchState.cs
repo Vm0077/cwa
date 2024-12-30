@@ -41,6 +41,7 @@ public class CrouchState: GroundState
             // Smoothly interpolate from current to target look direction
             smoothedLookInputDirection = Vector3.Slerp(_context.Motor.CharacterForward, _context._lookInputVector, 1 - Mathf.Exp(-OrientationSharpness * deltaTime)).normalized;
             // Set the current rotation (which will be used by the KinematicCharacterMotor)
+            Debug.Log(smoothedLookInputDirection);
             currentRotation = Quaternion.LookRotation(smoothedLookInputDirection, _context.Motor.CharacterUp);
         }
     }

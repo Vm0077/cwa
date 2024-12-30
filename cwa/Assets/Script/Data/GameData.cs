@@ -1,16 +1,20 @@
 using System;
+using System.Linq;
 using UnityEditor;
 
 public class GameData {
-    int deathCount;
-    int coin;
-    int life;
-    int star;
+    public int coin;
+    public int life;
+    public int star;
+    public float time;
     public long lastUpdated;
+    // TO-DO: save level
+    //public Dictionary<String, bool> level = new level;
+    // New Game
     public GameData() {
-        this.deathCount = 0;
         this.coin = 0;
-        this.life = 0;
+        this.life = 3;
         this.star = 0;
+        this.time = 0;
     }
 }

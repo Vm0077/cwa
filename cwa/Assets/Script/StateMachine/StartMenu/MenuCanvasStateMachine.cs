@@ -33,7 +33,6 @@ public class MenuCanvasStateMachine : MonoBehaviour, IStateMachine
         previousKey = CanvasState.TitleMenu;
     }
 
-
     public void TransitionToState(CanvasState key){
        isTransitioning = true;
        CurrentState.ExitState();
@@ -71,9 +70,14 @@ public class MenuCanvasStateMachine : MonoBehaviour, IStateMachine
         currentKey = CanvasState.TitleMenu;
         TransitionToState(currentKey);
     }
-    public void StartGame(){
-        SceneManager.LoadScene(Hubworld, LoadSceneMode.Single);
-        SceneManager.LoadSceneAsync(PersistenceGamplay, LoadSceneMode.Additive);
+    public void StartNewGame(){
+        DataPersistenceManager.instance.DeleteAllData();
+        DataPersistenceManager.instance.NewGame();
+        SceneSwapManager.instance.StartHubWorld();
+    }
+    public void StartContinueGame(){
+        DataPersistenceManager.instance.LoadGame();
+        SceneSwapManager.instance.StartHubWorld();
     }
     public void ExitGame(){
     #if UNITY_STANDALONE

@@ -64,6 +64,9 @@ public class AirborneState : CharacterMovementBaseState
 
     public override void SetInputs(ref PlayerCharacterInputs inputs)
     {
+        if(!_context.allowToMove){
+            return;
+        }
         Vector3 moveInputVector = Vector3.ClampMagnitude(new Vector3(inputs.MoveAxisRight, 0f, inputs.MoveAxisForward), 1f);
 
         // Calculate camera direction and rotation on the character plane
