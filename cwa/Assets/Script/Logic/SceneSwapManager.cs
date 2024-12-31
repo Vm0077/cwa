@@ -93,7 +93,15 @@ public class SceneSwapManager : MonoBehaviour
         UnloadSceneExcept(HubworldScene);
         SceneTransitionManager.Instance.LoadScene(scenes,"CrossFade");
     }
-
+   public void GoBackToHubWorldFromWin()
+    {
+        _isSpawnBack = true;
+        SceneManager.UnloadSceneAsync(ResultScene);
+        List<AsyncOperation> scenes = new List<AsyncOperation>();
+        scenes.Add(SceneManager.LoadSceneAsync(HubworldScene, LoadSceneMode.Single));
+        scenes.Add(SceneManager.LoadSceneAsync(PersistenceGamplay, LoadSceneMode.Additive));
+        SceneTransitionManager.Instance.LoadScene(scenes,"CrossFade");
+    }
 
     private void OnSceneLoad(Scene scene, LoadSceneMode mode) {
         if(_isFromDoor || _isSpawnBack){

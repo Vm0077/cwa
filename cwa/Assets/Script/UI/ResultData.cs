@@ -16,6 +16,7 @@ public class ResultData : MonoBehaviour,IDataPersistence
     {
         coin = data.coin;
         star = data.star;
+        timeToDisplay = data.time;
     }
 
     public void SaveData(GameData data)
@@ -37,5 +38,13 @@ public class ResultData : MonoBehaviour,IDataPersistence
   void UpdateTime() {
         TimeSpan timeSpan = TimeSpan.FromSeconds(timeToDisplay);
         timeText.text = "Time: " + timeSpan.ToString(@"mm\:ss\:ff");
+  }
+
+  public void GoBackToStart(){
+    SceneSwapManager.instance.SwapToStart();
+  }
+  public void GoBackToHubWorld(){
+    Debug.Log("click");
+    SceneSwapManager.instance.GoBackToHubWorldFromWin();
   }
 }
